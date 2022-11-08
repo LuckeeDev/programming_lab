@@ -13,7 +13,7 @@ int gcd(int a, int b) {
 
 int lcm(int a, int b) { return std::abs(a * b) / gcd(a, b); }
 
-TEST_CASE("Testin least common multiple") {
+TEST_CASE("Testing least common multiple") {
   CHECK(lcm(12, 16) == 48);
   CHECK(lcm(26, 15) == 390);
   CHECK(lcm(6, 6) == 6);
