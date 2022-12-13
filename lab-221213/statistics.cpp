@@ -14,25 +14,17 @@ class Sample {
   double sum_x_{};
   double sum_x2_{};
 
-  double mean() { return this->sum_x_ / this->N_; }
-
-  double sigma() {
-    return std::sqrt(this->sum_x2_ / this->N_ - std::pow(this->mean(), 2));
-  }
-
-  double mean_err() { return this->sigma() / std::sqrt(this->N_); }
-
  public:
   void add(double x) {
-    this->N_ += 1;
-    this->sum_x_ += x;
-    this->sum_x2_ += std::pow(x, 2);
+    ++N_;
+    sum_x_ += x;
+    sum_x2_ += std::pow(x, 2);
   }
 
-  Statistics statistics() {
-    double mean = this->mean();
-    double sigma = this->sigma();
-    double mean_err = this->mean_err();
+  Statistics statistics() const {
+    double mean = sum_x_ / N_;
+    double sigma = std::sqrt(sum_x2_ / N_ - std::pow(mean, 2));
+    double mean_err = sigma / std::sqrt(N_);
 
     return Statistics{mean, sigma, mean_err};
   }
