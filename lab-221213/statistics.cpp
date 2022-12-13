@@ -33,8 +33,18 @@ class Sample {
     }
 
     double mean = sum_x_ / N_;
-    double sigma = std::sqrt(sum_x2_ / N_ - std::pow(mean, 2));
+
+    if (N_ == 1) {
+      return Statistics{mean, -1, -1};
+    }
+
+    double sigma =
+        std::sqrt(sum_x2_ / (N_ - 1) - std::pow(sum_x_, 2) / (N_ * (N_ - 1)));
     double mean_err = sigma / std::sqrt(N_);
+
+    if (sigma == 0) {
+      return Statistics{mean, -1, -1};
+    }
 
     return Statistics{mean, sigma, mean_err};
   }
@@ -43,30 +53,41 @@ class Sample {
 TEST_CASE("Testing the class handling a floating point data sample") {
   Sample sample;
 
-  CHECK_THROWS(sample.statistics());
+  SUBCASE("Calling with no data throws an exception") {
+    CHECK_THROWS(sample.statistics());
+  }
 
-  sample.add(1.0);
+  SUBCASE("Calling with just one point returns undefined sigma") {
+    sample.add(1.0);
 
-  auto result = sample.statistics();
+    auto result = sample.statistics();
 
-  CHECK(result.mean == doctest::Approx(1.0));
-  CHECK(result.sigma == doctest::Approx(0.0));
-  CHECK(result.mean_err == doctest::Approx(0.0));
+    CHECK(result.mean == doctest::Approx(1.0));
+    CHECK(result.sigma == doctest::Approx(-1.0));
+    CHECK(result.mean_err == doctest::Approx(-1.0));
+  }
 
-  sample.add(1.0);
+  SUBCASE("Calling with two equal points returns undefined sigma") {
+    sample.add(2.0);
+    sample.add(2.0);
 
-  result = sample.statistics();
+    auto result = sample.statistics();
 
-  CHECK(result.mean == doctest::Approx(1.0));
-  CHECK(result.sigma == doctest::Approx(0.0));
-  CHECK(result.mean_err == doctest::Approx(0.0));
+    CHECK(result.mean == doctest::Approx(2.0));
+    CHECK(result.sigma == doctest::Approx(-1.0));
+    CHECK(result.mean_err == doctest::Approx(-1.0));
+  }
 
-  sample.add(2.0);
-  sample.add(4.0);
+  SUBCASE("Calling with some data should return the predicted output") {
+    sample.add(1.0);
+    sample.add(1.0);
+    sample.add(2.0);
+    sample.add(4.0);
 
-  result = sample.statistics();
+    auto result = sample.statistics();
 
-  CHECK(result.mean == doctest::Approx(2.0));
-  CHECK(result.sigma == doctest::Approx(1.224745));
-  CHECK(result.mean_err == doctest::Approx(0.612372));
+    CHECK(result.mean == doctest::Approx(2.0));
+    CHECK(result.sigma == doctest::Approx(1.414214));
+    CHECK(result.mean_err == doctest::Approx(0.707107));
+  }
 };
