@@ -19,6 +19,20 @@ class Sample {
 
   void clear() { entries_.clear(); }
 
+  int size() { return entries_.size(); }
+
+  bool remove(double point) {
+    auto position = std::find(entries_.begin(), entries_.end(), point);
+
+    if (position == entries_.end()) {
+      return false;
+    }
+
+    entries_.erase(position);
+
+    return true;
+  }
+
   Statistics statistics() const {
     int N_ = entries_.size();
 
@@ -52,6 +66,8 @@ class Sample {
 
 TEST_CASE("Testing the class handling a floating point data sample") {
   Sample sample;
+
+  REQUIRE(sample.size() == 0);
 
   SUBCASE("Calling with no data throws an exception") {
     CHECK_THROWS(sample.statistics());
@@ -89,5 +105,21 @@ TEST_CASE("Testing the class handling a floating point data sample") {
     CHECK(result.mean == doctest::Approx(2.0));
     CHECK(result.sigma == doctest::Approx(1.414214));
     CHECK(result.mean_err == doctest::Approx(0.707107));
+  }
+
+  SUBCASE("Removing an existing point") {
+    sample.add(1.5);
+    sample.add(2.0);
+
+    CHECK(sample.remove(2.0) == true);
+    CHECK(sample.size() == 1);
+  }
+
+  SUBCASE("Removing a non existing point") {
+    sample.add(1.5);
+    sample.add(2.0);
+
+    CHECK(sample.remove(1.9) == false);
+    CHECK(sample.size() == 2);
   }
 };
