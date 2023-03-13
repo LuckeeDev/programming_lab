@@ -9,6 +9,7 @@ struct Statistics {
   double mean{};
   double sigma{};
   double mean_err{};
+  double median{};
 };
 
 class Sample {
@@ -34,33 +35,46 @@ class Sample {
   }
 
   Statistics statistics() const {
-    int N_ = entries_.size();
+    auto entries{entries_};
+    auto e_begin{entries.begin()};
+    auto e_end{entries.end()};
 
-    if (N_ == 0) {
+    std::sort(e_begin, e_end);
+
+    int N = entries.size();
+
+    if (N == 0) {
       throw std::runtime_error("No data was added.");
     }
 
-    double sum_x_ = std::accumulate(entries_.begin(), entries_.end(), 0.);
+    double sum_x = std::accumulate(e_begin, e_end, 0.);
 
-    double mean = sum_x_ / N_;
+    double mean = sum_x / N;
 
-    if (N_ == 1) {
-      return Statistics{mean, -1, -1};
+    if (N == 1) {
+      return Statistics{mean, -1, -1, mean};
     }
 
-    double sum_x2_ = std::inner_product(entries_.begin(), entries_.end(),
-                                        entries_.begin(), 0);
+    double sum_x2 = std::inner_product(e_begin, e_end, e_begin, 0);
 
     double sigma =
-        std::sqrt(sum_x2_ / (N_ - 1) - std::pow(sum_x_, 2) / (N_ * (N_ - 1)));
+        std::sqrt(sum_x2 / (N - 1) - std::pow(sum_x, 2) / (N * (N - 1)));
 
-    double mean_err = sigma / std::sqrt(N_);
+    double mean_err = sigma / std::sqrt(N);
 
-    if (sigma == 0) {
-      return Statistics{mean, -1, -1};
+    double median{};
+
+    if (N % 2 == 0) {
+      median = (entries[N / 2 - 1] + entries[N / 2]) / 2;
+    } else {
+      median = entries[(N - 1) / 2];
     }
 
-    return Statistics{mean, sigma, mean_err};
+    if (sigma == 0) {
+      return Statistics{mean, -1, -1, median};
+    }
+
+    return Statistics{mean, sigma, mean_err, median};
   }
 };
 
@@ -81,6 +95,7 @@ TEST_CASE("Testing the class handling a floating point data sample") {
     CHECK(result.mean == doctest::Approx(1.0));
     CHECK(result.sigma == doctest::Approx(-1.0));
     CHECK(result.mean_err == doctest::Approx(-1.0));
+    CHECK(result.median == doctest::Approx(1.0));
   }
 
   SUBCASE("Calling with two equal points returns undefined sigma") {
@@ -92,6 +107,7 @@ TEST_CASE("Testing the class handling a floating point data sample") {
     CHECK(result.mean == doctest::Approx(2.0));
     CHECK(result.sigma == doctest::Approx(-1.0));
     CHECK(result.mean_err == doctest::Approx(-1.0));
+    CHECK(result.median == doctest::Approx(2.0));
   }
 
   SUBCASE("Calling with some data should return the predicted output") {
@@ -105,6 +121,7 @@ TEST_CASE("Testing the class handling a floating point data sample") {
     CHECK(result.mean == doctest::Approx(2.0));
     CHECK(result.sigma == doctest::Approx(1.414214));
     CHECK(result.mean_err == doctest::Approx(0.707107));
+    CHECK(result.median == doctest::Approx(1.5));
   }
 
   SUBCASE("Removing an existing point") {
