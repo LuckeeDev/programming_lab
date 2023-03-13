@@ -16,6 +16,9 @@ class Sample {
   std::vector<double> entries_{};
 
  public:
+  const auto& entries() const { return entries_; }
+  auto& entries() { return entries_; }
+
   void add(double x) { entries_.push_back(x); }
 
   void clear() { entries_.clear(); }
@@ -78,6 +81,16 @@ class Sample {
   }
 };
 
+Sample operator+(const Sample& l, const Sample& r) {
+  Sample sum{l};
+
+  std::vector<double>& sum_vector{sum.entries()};
+
+  sum_vector.insert(sum_vector.end(), r.entries().begin(), r.entries().end());
+
+  return sum;
+}
+
 TEST_CASE("Testing the class handling a floating point data sample") {
   Sample sample;
 
@@ -124,7 +137,7 @@ TEST_CASE("Testing the class handling a floating point data sample") {
     CHECK(result.median == doctest::Approx(1.5));
   }
 
-  SUBCASE("Removing an existing point") {
+  SUBCASE("Removing an existing point should return true") {
     sample.add(1.5);
     sample.add(2.0);
 
@@ -132,11 +145,27 @@ TEST_CASE("Testing the class handling a floating point data sample") {
     CHECK(sample.size() == 1);
   }
 
-  SUBCASE("Removing a non existing point") {
+  SUBCASE("Removing a non existing point should return false") {
     sample.add(1.5);
     sample.add(2.0);
 
     CHECK(sample.remove(1.9) == false);
     CHECK(sample.size() == 2);
+  }
+
+  SUBCASE("Adding two sample instances") {
+    sample.add(1);
+
+    Sample sample_two;
+    sample_two.add(2);
+
+    auto sum = sample + sample_two;
+
+    CHECK(sum.size() == 2);
+
+    if (sum.size() == 2) {
+      CHECK(sum.entries()[0] == doctest::Approx(1.0));
+      CHECK(sum.entries()[1] == doctest::Approx(2.0));
+    }
   }
 };
