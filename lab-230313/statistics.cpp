@@ -44,7 +44,7 @@ class Sample {
 
     std::sort(e_begin, e_end);
 
-    int N = entries.size();
+    uint N = entries.size();
 
     if (N == 0) {
       throw std::runtime_error("No data was added.");
@@ -58,14 +58,14 @@ class Sample {
       return Statistics{mean, -1, -1, mean};
     }
 
-    double sum_x2 = std::inner_product(e_begin, e_end, e_begin, 0);
+    double sum_x2 = std::inner_product(e_begin, e_end, e_begin, 0.);
 
     double sigma =
         std::sqrt(sum_x2 / (N - 1) - std::pow(sum_x, 2) / (N * (N - 1)));
 
     double mean_err = sigma / std::sqrt(N);
 
-    double median{};
+    double median;
 
     if (N % 2 == 0) {
       median = (entries[N / 2 - 1] + entries[N / 2]) / 2;
@@ -168,4 +168,4 @@ TEST_CASE("Testing the class handling a floating point data sample") {
       CHECK(sum.entries()[1] == doctest::Approx(2.0));
     }
   }
-};
+}
