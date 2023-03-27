@@ -31,5 +31,12 @@
 *.out
 *.app
 
-#VSCode folder
+# VSCode folder
 .vscode
+
+# JetBrains folder
+.idea
+
+# Build output
+build
+cmake-build-debug
