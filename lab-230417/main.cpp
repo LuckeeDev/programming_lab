@@ -8,6 +8,7 @@ int main() {
   pf::Sample data{};
 
   std::ifstream input("./data.txt");
+  std::ofstream output("./result.txt");
 
   std::string s;
 
@@ -17,8 +18,8 @@ int main() {
   }
 
   const auto stat{data.statistics()};
-  std::cout << "- mean: " << stat.mean << '\n'
-            << "- sigma: " << stat.sigma << '\n'
-            << "- median: " << stat.median << '\n'
-            << "- mean err: " << stat.mean_err << '\n';
+  output << "- mean: " << stat.mean << '\n'
+         << "- sigma: " << stat.sigma << '\n'
+         << "- median: " << stat.median << '\n'
+         << "- mean err: " << stat.mean_err << '\n';
 }
