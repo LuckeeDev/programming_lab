@@ -10,6 +10,10 @@ int main() {
   std::ifstream input("./data.txt");
   std::ofstream output("./result.txt");
 
+  if (!output) {
+    std::cout << "The output file could not be open." << '\n';
+  }
+
   std::string s;
 
   while (std::getline(input, s)) {
@@ -18,6 +22,7 @@ int main() {
   }
 
   const auto stat{data.statistics()};
+
   output << "- mean: " << stat.mean << '\n'
          << "- sigma: " << stat.sigma << '\n'
          << "- median: " << stat.median << '\n'
