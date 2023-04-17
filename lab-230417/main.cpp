@@ -1,3 +1,4 @@
+#include <fstream>
 #include <iostream>
 #include <random>
 
@@ -6,15 +7,18 @@
 int main() {
   pf::Sample data{};
 
-  std::random_device r;
-  std::default_random_engine eng(r());
-  std::normal_distribution<double> dist;
+  std::ifstream input("./data.txt");
 
-  for (int i = 0; i < 1000000; i++) {
-    data.add(dist(eng));
+  std::string s;
+
+  while (std::getline(input, s)) {
+    double x = std::stod(s);
+    data.add(x);
   }
 
   const auto stat{data.statistics()};
   std::cout << "- mean: " << stat.mean << '\n'
-            << "- sigma: " << stat.sigma << '\n';
+            << "- sigma: " << stat.sigma << '\n'
+            << "- median: " << stat.median << '\n'
+            << "- mean err: " << stat.mean_err << '\n';
 }
