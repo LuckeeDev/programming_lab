@@ -6,18 +6,23 @@
 
 #include "statistics.hpp"
 
+namespace pf {
 class custom_generator {
-  std::random_device r_;
-  std::default_random_engine eng{r_()};
-  std::normal_distribution<double> dist;
+  std::default_random_engine eng_;
+  std::normal_distribution<double> dist_;
 
  public:
-  double operator()() { return dist(eng); }
+  custom_generator() {
+    std::random_device r;
+    eng_ = std::default_random_engine(r());
+  };
+
+  double operator()() { return dist_(eng_); }
 };
+}  // namespace pf
 
 int main() {
   pf::Sample data{};
-  auto inserter = std::back_inserter(data);
 
   std::ifstream input("./data.txt");
   std::ofstream output("./result.txt");
@@ -26,7 +31,10 @@ int main() {
     std::cout << "The output file could not be open." << '\n';
   }
 
-  std::generate_n(inserter, 100000, custom_generator{});
+  auto inserter = std::back_inserter(data);
+  pf::custom_generator gen;
+
+  std::generate_n(inserter, 100000, gen);
 
   const auto stat{data.statistics()};
 
