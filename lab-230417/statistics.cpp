@@ -19,6 +19,8 @@ bool Sample::remove(double x) {
   return false;
 }
 
+void Sample::push_back(double x) { entries_.push_back(x); }
+
 Statistics Sample::statistics() const {
   const int N{size()};
 

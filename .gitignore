@@ -41,5 +41,6 @@
 build
 cmake-build-debug
 
-# Input files
+# Input and output files
 data.txt
+result.txt

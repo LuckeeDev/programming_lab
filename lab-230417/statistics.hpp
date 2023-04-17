@@ -4,32 +4,36 @@
 #include <vector>
 
 namespace pf {
-  struct Statistics {
-    double mean{};
-    double sigma{};
-    double mean_err{};
-    double median{};
-  };
+struct Statistics {
+  double mean{};
+  double sigma{};
+  double mean_err{};
+  double median{};
+};
 
-  class Sample {
-    std::vector<double> entries_;
+class Sample {
+  std::vector<double> entries_;
 
-   public:
-    int size() const { return entries_.size(); }
+ public:
+  int size() const { return entries_.size(); }
 
-    auto& entries() { return entries_; }
-    const auto& entries() const { return entries_; }
+  auto& entries() { return entries_; }
+  const auto& entries() const { return entries_; }
 
-    void add(double);    
-    bool remove(double);
-    
-    Statistics statistics() const;
+  void add(double);
+  bool remove(double);
 
-    Sample& operator+=(const Sample&);
-  };
+  void push_back(double);
 
-  Sample operator+(const Sample&, const Sample&);
-}
+  Statistics statistics() const;
+
+  Sample& operator+=(const Sample&);
+
+  using value_type = double;
+};
+
+Sample operator+(const Sample&, const Sample&);
+
+}  // namespace pf
 
 #endif
-
