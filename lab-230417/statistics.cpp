@@ -4,10 +4,9 @@
 #include <cmath>
 #include <numeric>
 #include <stdexcept>
+#include <vector>
 
 namespace pf {
-
-void Sample::add(double x) { entries_.push_back(x); }
 
 bool Sample::remove(double x) {
   auto const it = std::find(entries_.begin(), entries_.end(), x);
@@ -18,6 +17,8 @@ bool Sample::remove(double x) {
   }
   return false;
 }
+
+void Sample::clear() { entries_.clear(); }
 
 void Sample::push_back(double x) { entries_.push_back(x); }
 

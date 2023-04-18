@@ -14,13 +14,13 @@ TEST_CASE("Testing the class handling a floating point data sample") {
   }
 
   SUBCASE("Calling statistics() with one point throws") {
-    sample.add(4.0);
+    sample.push_back(4.0);
     CHECK_THROWS(sample.statistics());
   }
 
   SUBCASE("Calling statistics() with two points") {
-    sample.add(1.0);
-    sample.add(2.0);
+    sample.push_back(1.0);
+    sample.push_back(2.0);
     const auto result = sample.statistics();
     CHECK(result.mean == doctest::Approx(1.5));
     CHECK(result.sigma == doctest::Approx(0.70710678));
@@ -29,8 +29,8 @@ TEST_CASE("Testing the class handling a floating point data sample") {
   }
 
   SUBCASE("Calling statistics() with two identical points") {
-    sample.add(10.0);
-    sample.add(10.0);
+    sample.push_back(10.0);
+    sample.push_back(10.0);
     const auto result = sample.statistics();
     CHECK(result.mean == doctest::Approx(10.0));
     CHECK(result.sigma == doctest::Approx(0.0));
@@ -39,11 +39,11 @@ TEST_CASE("Testing the class handling a floating point data sample") {
   }
 
   SUBCASE("Calling statistics() with five points") {
-    sample.add(1.5);
-    sample.add(2.0);
-    sample.add(2.5);
-    sample.add(3.0);
-    sample.add(3.5);
+    sample.push_back(1.5);
+    sample.push_back(2.0);
+    sample.push_back(2.5);
+    sample.push_back(3.0);
+    sample.push_back(3.5);
     const auto result = sample.statistics();
     CHECK(result.mean == doctest::Approx(2.5));
     CHECK(result.sigma == doctest::Approx(0.79056942));
@@ -52,23 +52,23 @@ TEST_CASE("Testing the class handling a floating point data sample") {
   }
 
   SUBCASE("Removing an existing point") {
-    sample.add(1.5);
-    sample.add(2.0);
+    sample.push_back(1.5);
+    sample.push_back(2.0);
     CHECK(sample.remove(2.0) == true);
     CHECK(sample.size() == 1);
   }
 
   SUBCASE("Removing a non existing point") {
-    sample.add(1.5);
-    sample.add(2.0);
+    sample.push_back(1.5);
+    sample.push_back(2.0);
     CHECK(sample.remove(1.9) == false);
     CHECK(sample.size() == 2);
   }
 
   SUBCASE("Testing sum operator") {
-    sample.add(1);
+    sample.push_back(1);
     pf::Sample sample_two;
-    sample_two.add(2);
+    sample_two.push_back(2);
     auto sum = sample + sample_two;
     CHECK(sum.size() == 2);
     if (sum.size() == 2) {

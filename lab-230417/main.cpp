@@ -2,44 +2,133 @@
 #include <fstream>
 #include <iostream>
 #include <iterator>
-#include <random>
+#include <vector>
 
+#include "generator.hpp"
 #include "statistics.hpp"
 
-namespace pf {
-class custom_generator {
-  std::default_random_engine eng_;
-  std::normal_distribution<double> dist_;
-
- public:
-  custom_generator() {
-    std::random_device r;
-    eng_ = std::default_random_engine(r());
-  };
-
-  double operator()() { return dist_(eng_); }
+enum Commands {
+  Clear = 'c',
+  Read = 'r',
+  Generate = 'g',
+  Print = 's',
+  Write = 'o',
+  Quit = 'q',
+  Help = 'h'
 };
-}  // namespace pf
 
 int main() {
+  std::cout << "Type h and hit enter to get help." << '\n';
+
+  std::string s;
   pf::Sample data{};
 
-  std::ifstream input("./data.txt");
-  std::ofstream output("./result.txt");
+  while (std::getline(std::cin, s)) {
+    auto command = s[0];
 
-  if (!output) {
-    std::cout << "The output file could not be open." << '\n';
+    s.erase(0, 2);
+
+    switch (command) {
+      case Commands::Clear: {
+        data.clear();
+        break;
+      }
+
+      case Commands::Read: {
+        std::string current;
+
+        std::ifstream input(s);
+
+        while (std::getline(input, current)) {
+          const auto d = std::stod(current);
+          data.push_back(d);
+        }
+
+        break;
+      }
+
+      case Commands::Generate: {
+        const auto first = s.find(' ');
+        const auto count = std::stod(s.substr(0, first));
+        s.erase(0, first + 1);
+
+        const auto second = s.find(' ');
+
+        double min{}, max{};
+
+        if (second != std::string::npos) {
+          min = std::stod(s.substr(0, second));
+          s.erase(0, second + 1);
+        }
+
+        const auto end = s.find(' ');
+
+        if (end != std::string::npos) {
+          std::cout << "Too many arguments!";
+          break;
+        } else {
+          max = std::stod(s.substr(0, end));
+        }
+
+        pf::generator generator(min, max);
+
+        std::generate_n(std::back_inserter(data), count, generator);
+
+        break;
+      }
+
+      case Commands::Print: {
+        const auto stat{data.statistics()};
+
+        std::cout << "- mean: " << stat.mean << '\n'
+                  << "- sigma: " << stat.sigma << '\n'
+                  << "- median: " << stat.median << '\n'
+                  << "- mean err: " << stat.mean_err << '\n';
+        break;
+      }
+
+      case Commands::Write: {
+        std::ofstream output(s);
+
+        if (!output) {
+          std::cout << "The file could not be open." << '\n';
+          break;
+        }
+
+        const auto stat{data.statistics()};
+
+        output << "- mean: " << stat.mean << '\n'
+               << "- sigma: " << stat.sigma << '\n'
+               << "- median: " << stat.median << '\n'
+               << "- mean err: " << stat.mean_err << '\n';
+
+        break;
+      }
+
+      case Commands::Quit: {
+        return 0;
+      }
+
+      case Commands::Help: {
+        std::cout
+            << "Available commands are:" << '\n'
+            << "- c: Clear the data sample" << '\n'
+            << "- r FILE_NAME: Read data from a file at path FILE_NAME" << '\n'
+            << "- o FILE_NAME: Write statistics to a file at path FILE_NAME"
+            << '\n'
+            << "- s: Print statistics to terminal" << '\n'
+            << "- g COUNT (MIN MAX): Generate COUNT random numbers. "
+            << "You can optionally specify the minimum and maximum." << '\n'
+            << "- q: Quit" << '\n';
+
+        break;
+      }
+
+      default: {
+        std::cout
+            << "This command does not exist. Type h and hit enter to get help."
+            << '\n';
+      }
+    }
   }
-
-  auto inserter = std::back_inserter(data);
-  pf::custom_generator gen;
-
-  std::generate_n(inserter, 100000, gen);
-
-  const auto stat{data.statistics()};
-
-  output << "- mean: " << stat.mean << '\n'
-         << "- sigma: " << stat.sigma << '\n'
-         << "- median: " << stat.median << '\n'
-         << "- mean err: " << stat.mean_err << '\n';
 }

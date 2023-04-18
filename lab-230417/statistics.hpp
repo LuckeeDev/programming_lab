@@ -20,8 +20,8 @@ class Sample {
   auto& entries() { return entries_; }
   const auto& entries() const { return entries_; }
 
-  void add(double);
   bool remove(double);
+  void clear();
 
   void push_back(double);
 
