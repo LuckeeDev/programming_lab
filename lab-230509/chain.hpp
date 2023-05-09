@@ -10,6 +10,7 @@ class Chain {
   std::vector<ParticleState> m_particle_states;
 
   ParticleState solve(ParticleState const& ps, double f, double delta_t) const;
+  void sorted_insert(ParticleState const& ps, std::vector<ParticleState>&);
 
  public:
   Chain(Hooke const& inter);
