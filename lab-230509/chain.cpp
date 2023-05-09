@@ -1,8 +1,8 @@
 #include "chain.hpp"
 
-#include <algorithm>
 #include <cmath>
 #include <iostream>
+#include <numeric>
 #include <vector>
 
 ParticleState Chain::solve(ParticleState const& ps, double f,
@@ -69,14 +69,27 @@ void Chain::evolve(double delta_t) {
 };
 
 void Chain::draw(sf::RenderTarget& target, sf::RenderStates states) const {
+  float const SCALE_FACTOR = 9000.f;
+
   target.clear(sf::Color::White);
 
   auto begin = m_particle_states.begin();
   auto end = m_particle_states.end();
 
+  auto c_m =
+      std::accumulate(begin, end, 0.f,
+                      [](const float& acc, const ParticleState& current) {
+                        return acc + current.x * current.m;
+                      }) /
+      std::accumulate(begin, end, 0.f,
+                      [](const float& acc, const ParticleState& current) {
+                        return acc + current.m;
+                      });
+
   for (auto it = begin; it < end; it++) {
     sf::CircleShape circle(30.f);
-    circle.setPosition(static_cast<float>(it->x) * 10000.f, 275.f);
+    circle.setPosition(static_cast<float>(it->x) * SCALE_FACTOR, 270.f);
+    circle.move(505.f - c_m * SCALE_FACTOR, 0.f);
     circle.setOutlineColor(sf::Color::Black);
     circle.setOutlineThickness(3.f);
 

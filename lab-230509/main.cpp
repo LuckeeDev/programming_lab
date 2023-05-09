@@ -6,14 +6,28 @@
 #include "chain.hpp"
 
 int main() {
-  Hooke const hooke{1.0, 0.01};
+  double k;
+  double l;
+  double p_m;
+  double delta_x;
+
+  std::cout << "Input k (N): ";
+  std::cin >> k;
+
+  std::cout << "Input l (m): ";
+  std::cin >> l;
+
+  std::cout << "Input particle mass (kg): ";
+  std::cin >> p_m;
+
+  std::cout << "Input delta x (m): ";
+  std::cin >> delta_x;
+
+  Hooke const hooke{k, l};
 
   Chain chain(hooke);
 
-  double const p_m{0.05};
-
   double p_x{0.0};
-  double delta_x{0.011};
 
   for (auto const p_v : {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0}) {
     chain.push_back({p_m, p_x, p_v});
