@@ -24,6 +24,8 @@ class Chain : public sf::Drawable {
   std::vector<ParticleState> const& state() const;
 
   ParticleState& operator[](int);
+
+  using value_type = ParticleState;
 };
 
 #endif

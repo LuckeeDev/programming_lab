@@ -28,11 +28,13 @@ int main() {
   Chain chain(hooke);
 
   double p_x{0.0};
+  double const p_v{0.0};
 
-  for (auto const p_v : {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0}) {
-    chain.push_back({p_m, p_x, p_v});
-    p_x += delta_x;
-  }
+  std::generate_n(std::back_inserter(chain), 10, [&]() mutable {
+    ParticleState ps{p_m, p_x, p_v};
+    p_x = p_x + delta_x;
+    return ps;
+  });
 
   sf::RenderWindow window(sf::VideoMode(1100, 600), "Chain of springs");
 
