@@ -5,8 +5,11 @@
 #include "hooke.hpp"
 
 class Chain {
+ private:
   Hooke m_inter;
   std::vector<ParticleState> m_particle_states;
+
+  ParticleState solve(ParticleState const& ps, double f, double delta_t) const;
 
  public:
   Chain(Hooke const& inter);
