@@ -67,3 +67,19 @@ void Chain::evolve(double delta_t) {
 
   m_particle_states = new_states;
 };
+
+void Chain::draw(sf::RenderTarget& target, sf::RenderStates states) const {
+  target.clear(sf::Color::White);
+
+  auto begin = m_particle_states.begin();
+  auto end = m_particle_states.end();
+
+  for (auto it = begin; it < end; it++) {
+    sf::CircleShape circle(30.f);
+    circle.setPosition(static_cast<float>(it->x) * 10000.f, 275.f);
+    circle.setOutlineColor(sf::Color::Black);
+    circle.setOutlineThickness(3.f);
+
+    target.draw(circle);
+  };
+}

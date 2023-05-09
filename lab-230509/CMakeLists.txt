@@ -18,7 +18,11 @@ string(APPEND CMAKE_CXX_FLAGS " -Wall -Wextra")
 string(APPEND CMAKE_CXX_FLAGS_DEBUG " -fsanitize=address,undefined -fno-omit-frame-pointer")
 string(APPEND CMAKE_EXE_LINKER_FLAGS_DEBUG " -fsanitize=address,undefined -fno-omit-frame-pointer")
 
+find_package(SFML 2.5 COMPONENTS graphics REQUIRED)
+
 add_executable(chain main.cpp hooke.cpp chain.cpp)
+
+target_link_libraries(chain PRIVATE sfml-graphics)
 
 # se il testing e' abilitato...
 #   per disabilitare il testing, passare -DBUILD_TESTING=OFF a cmake durante la fase di configurazione
@@ -29,6 +33,7 @@ if (BUILD_TESTING)
   target_sources(all.test PRIVATE chain.test.cpp chain.cpp)
   # aggiungi l'eseguibile statistics.t alla lista dei test
   add_test(NAME all.test COMMAND all.test)
+  target_link_libraries(all.test PRIVATE sfml-graphics)
 
 endif()
 
